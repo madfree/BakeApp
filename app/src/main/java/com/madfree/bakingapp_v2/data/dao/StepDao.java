@@ -30,5 +30,5 @@ public interface StepDao {
     LiveData<List<StepEntity>> getStepsForRecipe(final int recipeId);
 
     @Query("SELECT * FROM steps WHERE recipeId=:recipeId AND stepId=:stepId")
-    List<StepEntity> getStepById(final int recipeId, final int stepId);
+    LiveData<StepEntity> getStepById(final int recipeId, final int stepId);
 }

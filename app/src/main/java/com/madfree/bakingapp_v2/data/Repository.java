@@ -48,16 +48,17 @@ public class Repository {
         return mDb.recipeDao().getRecipeById(recipeId);
     }
 
-    public LiveData<List<IngredientEntity>> loadIngredients(final int recipeId) {
+    public LiveData<List<IngredientEntity>> loadIngredientsForRecipe(final int recipeId) {
         return mDb.ingredientDao().getIngredientsForRecipe(recipeId);
     }
 
-    public LiveData<List<StepEntity>> loadSteps(final int recipeId) {
+    public LiveData<List<StepEntity>> loadStepsForRecipe(final int recipeId) {
         return mDb.stepDao().getStepsForRecipe(recipeId);
     }
-//
-//    public LiveData<StepEntity> loadSingleSteps(final int recipeId, final int stepId) {
-//        return mDb.stepDao().getSingleStep(recipeId, stepId);
-//    }
+
+    public LiveData<StepEntity> loadSingleStep(int recipeId, int stepId) {
+        return mDb.stepDao().getStepById(recipeId, stepId);
+    }
+
 
 }

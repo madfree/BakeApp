@@ -2,8 +2,11 @@ package com.madfree.bakingapp_v2.detail;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.INotificationSideChannel;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +18,9 @@ import android.widget.ListView;
 
 import com.madfree.bakingapp_v2.R;
 import com.madfree.bakingapp_v2.data.AppDatabase;
+import com.madfree.bakingapp_v2.data.Repository;
 import com.madfree.bakingapp_v2.data.entity.IngredientEntity;
+import com.madfree.bakingapp_v2.data.entity.StepEntity;
 import com.madfree.bakingapp_v2.data.model.Ingredient;
 import com.madfree.bakingapp_v2.main.RecipesListAdapter;
 import com.madfree.bakingapp_v2.utils.AppExecutors;
@@ -27,10 +32,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final String LOG_TAG = DetailActivity.class.getSimpleName();
     public static final String RECIPE_ID = "RECIPE_ID";
 
-    private RecyclerView mRecyclerView;
-    private IngredientAdapter mAdapter;
-
-    private LiveData<List<IngredientEntity>> ingredientList;
+    private SharedViewModel sharedViewModel;
     private int recipeId;
 
 
@@ -44,19 +46,16 @@ public class DetailActivity extends AppCompatActivity {
         recipeId = intent.getIntExtra(RECIPE_ID, 0);
         Log.d(LOG_TAG, "Starting DetailActivity with this recipeId: " + recipeId);
 
-        mRecyclerView = findViewById(R.id.ingredients_recycler_view);
-        mAdapter = new IngredientAdapter();
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(mAdapter);
+        sharedViewModel = ViewModelProviders.of(this).get(SharedViewModel.class);
+        sharedViewModel.setRecipeId(recipeId);
 
-        final AppDatabase mDb = AppDatabase.getsInstance(this);
-        mDb.ingredientDao().getIngredientsForRecipe(recipeId).observe(this, new Observer<List<IngredientEntity>>() {
-                    @Override
-                    public void onChanged(@Nullable List<IngredientEntity> ingredientEntities) {
-                        mAdapter.setIngredients(ingredientEntities);
-                        Log.d(LOG_TAG, "Returning ingredientList from database with size: " + ingredientEntities.size());
-                    }
-        });
-
+        DetailListsFragment detailListFragment = new DetailListsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("recipeId", recipeId);
+        detailListFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.fragment_detail_container, detailListFragment)
+                .commit();
     }
 }
